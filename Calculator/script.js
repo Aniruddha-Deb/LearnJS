@@ -15,12 +15,8 @@ function getToken() {
 }
 
 function onLoad() {
-	document.addEventListener( "keypress", (e) => {
-		var key = e.keyCode ? e.keyCode : e.which;
-
-		if( key == 13 ) {
-			onCalculateClick();
-		}
+	document.addEventListener( "keydown", (e) => {
+		onCalculateClick();
 	} );
 }
 

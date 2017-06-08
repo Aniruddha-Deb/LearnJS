@@ -1,0 +1,36 @@
+<canvas id="canvas" height="400" width="600"></canvas>
+<script>
+x = y = 50;
+rad = 50;
+xStep = yStep = 2;
+
+window.onload = function() {
+	var canvas = document.getElementById( "canvas" );
+	var ctx = canvas.getContext( "2d" );
+	setInterval( function() {
+		ctx.fillStyle="black";
+		ctx.fillRect( 0, 0, canvas.width, canvas.height );
+
+		ctx.fillStyle = "white";
+		ctx.beginPath();
+		ctx.arc( x+xStep, y+yStep, 50, 0, 2*Math.PI );
+		ctx.fill();
+
+		if( x + rad >= canvas.width ) {
+			xStep = -2;
+		}
+		if( x - rad < 0 ) {
+			xStep = 2;
+		}
+		if( y + rad >= canvas.height ) {
+			yStep = -2;
+		}
+		if( y - rad < 0 ) {
+			yStep = 2;
+		}
+
+		x += xStep;
+		y += yStep;
+	}, 10 );
+}
+</script>
