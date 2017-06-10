@@ -4,9 +4,14 @@
   "description": "project to learn node.js",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"No Test Defined\" && exit -1",
     "start": "node index.js"
   },
   "author": "Aniruddha Deb (Sensei)",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.3",
+    "mongoose": "^4.10.5"
+  }
 }
