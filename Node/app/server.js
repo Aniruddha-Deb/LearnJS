@@ -1,41 +1,17 @@
-var express = require( 'express' );
-var app = express();
-var bodyParser = require( 'body-parser' );
+var mongoose = require( "mongoose" );
+mongoose.Promise = require( "bluebird" );
+mongoose.connect( "mongodb://localhost/test" );
+var db = mongoose.connection;
+db.on( "error", console.error.bind(console, 'connection error:') );
+db.once( "open", function() {
 
-app.use( bodyParser.urlencoded( { extended: true } ) );
-app.use(bodyParser.json());
-
-var port = process.env.PORT || 8080;
-
-var router = express.Router();
-
-router.get( '/', ( req, res ) => {
-    res.json({ message: 'hooray! welcome to our api!' });   
-} );
-
-app.use( '/api', router );
-
-app.listen( port );
-console.log( 'Magic happens on port ' + port );
-
-var mongoose = require( 'mongoose' );
-mongoose.connect('mongodb://node:noder@novus.modulusmongo.net:27017/Iganiq8o');
-
-var Bear = require( './bear.js' );
-
-router.route( '/bears/' )
-    .post( (req, res) => {
-
-        var bear = new Bear();      
-        bear.name = req.body.name;  
-
-        bear.save( function( err ) {
-            if ( err ) {
-                res.send(err);
-            }
-
-            res.json({ message: 'Bear created!' });
-        });
-
+    var KittenSchema = mongoose.Schema( {
+        name: String
     } );
-app.use( '/api', router );
+    var Kitten = mongoose.model( 'Kitten', KittenSchema );
+
+    var fluffy = new Kitten( { name: "Fluffy" } );
+    console.log( fluffy.name );
+    fluffy.save( (err, kittens) => {} );
+    db.close();
+} );
