@@ -1,12 +1,13 @@
 <html>
-	<head>
-		<script src="script.js"> </script>
-	</head>
-	<body onload="onLoad()">
-		<input type="text" id="expression"> 
+	<body>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>		
+		<script src="script.js"></script>
+		<input type="text" id="expression">
 		<text>=</text>
 		<text id="answer"></text><br>
 		<button onclick="onCalculateClick()">Calculate</button>
-		<button onclick="onClearClick()">Clear</button>
+		<button onclick="onClearClick()">Clear</button><br>
+		<text>History: </text><br>
+		<text id="history"></text>
 	</body>
 </html>

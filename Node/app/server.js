@@ -124,19 +124,55 @@ function isOperator( c ) {
 
 var express = require( 'express' );
 var app = express();
-var bodyParser = require( 'body-parser' );
+var mongoose = require( 'mongoose' );
+mongoose.connect( "mongodb://localhost/calculator" );
+var db = mongoose.connection;
+var History = mongoose.model( 'History', mongoose.Schema( {
+    expression: String, 
+    answer: String
+} ) ) ;
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.all('*', function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'accept, content-type, x-parse-application-id, x-parse-rest-api-key, x-parse-session-token');
+    if ('OPTIONS' == req.method) {
+      res.send(200);
+    }
+    else {
+      next();
+    }
+});
 
 app.get( '/api/calculate', ( req, res ) => {
     var expression = req.query.expression;
-    console.log( expression );
     pushedBackTokenStack=[];
     tokenList=[];
     Lexer( expression );
     var answer = Evaluator();
+
+    // Save history to MongoDB
+    new History( { 
+        expression: expression, 
+        answer: answer+""
+    } ).save();
+
     res.send( answer+"" );
+} );
+
+app.get( '/api/history', ( req, res ) => {
+    var history = "";
+    var query = History.find( {} )
+                       .limit( 10 )
+                       .select({ "expression": 1, "answer": 1, "_id": 0})
+                       .sort( { "_id": -1 } );
+
+    query.exec(function ( err, someValue ) {
+        someValue.forEach( (entry) => {
+            history += entry.expression + " = " + entry.answer + "<br>";
+        } )
+        res.send( history );
+    });    
 } );
 
 app.listen( 8080 );
