@@ -34,6 +34,9 @@ function Lexer( expression ) {
             tokenList.push( new Token( expression.charAt( i ), 
                     PARENTHESES ) );            
         }
+        else {
+            throw "Bad Token!";
+        }
     }
 }
 
@@ -61,7 +64,7 @@ function Evaluator() {
             break;
         }
     }
-    console.log( "answer is " + answer );
+    console.log( "Answer is " + answer );
     return answer;
 }
 
@@ -102,6 +105,9 @@ function evaluateMDOp() {
         answer = Evaluator();
         token = getToken();
     }
+    else {
+        throw "Bad Expression";
+    }
     return answer;
 }
 
@@ -125,6 +131,8 @@ function isOperator( c ) {
 var express = require( 'express' );
 var app = express();
 var mongoose = require( 'mongoose' );
+mongoose.Promise = require( 'bluebird' );
+
 mongoose.connect( "mongodb://localhost/calculator" );
 var db = mongoose.connection;
 var History = mongoose.model( 'History', mongoose.Schema( {
@@ -134,8 +142,9 @@ var History = mongoose.model( 'History', mongoose.Schema( {
 
 app.all('*', function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Methods', 'GET');
     res.header('Access-Control-Allow-Headers', 'accept, content-type, x-parse-application-id, x-parse-rest-api-key, x-parse-session-token');
+
     if ('OPTIONS' == req.method) {
       res.send(200);
     }
@@ -148,16 +157,20 @@ app.get( '/api/calculate', ( req, res ) => {
     var expression = req.query.expression;
     pushedBackTokenStack=[];
     tokenList=[];
-    Lexer( expression );
-    var answer = Evaluator();
+    var answer = 0;
+    try {
+        Lexer( expression );
+        answer = Evaluator();
+        new History( { 
+            expression: expression, 
+            answer: answer+""
+        } ).save();
 
-    // Save history to MongoDB
-    new History( { 
-        expression: expression, 
-        answer: answer+""
-    } ).save();
-
-    res.send( answer+"" );
+        res.send( { status: true, answer: answer } );
+    }
+    catch( err ) {
+        res.send( { status: false } );
+    }
 } );
 
 app.get( '/api/history', ( req, res ) => {

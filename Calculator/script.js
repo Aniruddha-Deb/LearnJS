@@ -3,7 +3,13 @@ function onCalculateClick() {
 	expr = encodeURIComponent( expr );
 	$.get( "http://192.168.0.100:8080/api/calculate?expression="+expr, 
 			( data, status ) => {
-				document.getElementById( "answer" ).innerHTML = data;				
+				response = data;
+				if( response.status ) {
+					document.getElementById( "answer" ).innerHTML = response.answer;									
+				}
+				else {
+					document.getElementById( "expression" ).style.backgroundColor = "red";	
+				}
 			} );
 	refreshHistory();
 }
@@ -19,7 +25,9 @@ function refreshHistory() {
 			} );
 }
 
-$(document).keypress( function( event ){
+$(document).keypress( function( event ) {
+	document.getElementById( "expression" ).style.backgroundColor = "white";	
+
 	if( event.which == 13 ) {
 		onCalculateClick();
 	}
